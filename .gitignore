@@ -1,0 +1,50 @@
+# Build artifacts
+bin/
+obj/
+obj/Debug/
+obj/Release/
+bin/Debug/
+src/bin/
+src/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio / VSCode
+.vs/
+.vscode/
+
+# Logs
+*.log
+*.svclog
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
+# Rider / ReSharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# Dotnet tools
+.store/
+.dotnet/
+
+# Coverage
+coverage*/ 
+*.coverage
+*.coveragexml
+
+# Others
+launchSettings.json
+*.db
+*.db-shm
+*.db-wal

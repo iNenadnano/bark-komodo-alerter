@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  bark-komodo-alerter:
+    image: ghcr.io/${GITHUB_OWNER:-your-org}/bark-komodo-alerter:latest
+    # For local dev, uncomment to build from the current directory
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      - PORT=${PORT:-8080}
+      - BARK_ENDPOINT=${BARK_ENDPOINT:-https://api.day.app/push}
+      # Optional: set a Bark group tag for the push
+      - BARK_GROUP=${BARK_GROUP:-}
+      # Optional: set a Bark icon URL
+      - BARK_ICON=${BARK_ICON:-}
+    restart: unless-stopped
