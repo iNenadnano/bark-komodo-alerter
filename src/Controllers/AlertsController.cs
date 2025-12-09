@@ -3,14 +3,16 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using KomodoBarkAlerter.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace KomodoBarkAlerter.Controllers;
 
 [ApiController]
 [Route("alert")]
-public class AlertsController(IHttpClientFactory httpClientFactory) : ControllerBase
+public class AlertsController(IHttpClientFactory httpClientFactory, ILogger<AlertsController> logger) : ControllerBase
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ILogger<AlertsController> _logger = logger;
 
     private static readonly JsonSerializerOptions JsonOptions;
 
@@ -26,6 +28,8 @@ public class AlertsController(IHttpClientFactory httpClientFactory) : Controller
     [HttpPost]
     public async Task<IActionResult> PostAlert([FromBody] JsonElement alertElement)
     {
+        _logger.LogInformation("Received alert payload: {AlertPayload}", alertElement.GetRawText());
+
         Alert? alert;
         try
         {
