@@ -109,84 +109,79 @@ namespace BarkKomodoAlerter.Model
             return r.Type switch
             {
                 AlertType.Test => WithLink(
-                    $"{level} | If you see this message, then Alerter {r.GetString("name")} is working",
-                    ResourceLink("alerter", r.GetString("id"))),
+                    $"{level} | If you see this message, then Alerter {r.GetString("name")} is working", ""),
                 AlertType.ServerVersionMismatch => alert.Level == SeverityLevel.Ok
                     ? WithLink(
-                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Periphery version now matches Core version ✅",
-                        ResourceLink("server", r.GetString("id")))
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Periphery version now matches Core version ✅", "")
                     : WithLink(
-                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Version mismatch detected ⚠️\nPeriphery: {r.GetString("server_version")} | Core: {r.GetString("core_version")}",
-                        ResourceLink("server", r.GetString("id"))),
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Version mismatch detected ⚠️\nPeriphery: {r.GetString("server_version")} | Core: {r.GetString("core_version")}", ""),
                 AlertType.ServerUnreachable => alert.Level switch
                 {
                     SeverityLevel.Ok => WithLink(
-                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is now reachable",
-                        ResourceLink("server", r.GetString("id"))),
-                    SeverityLevel.Critical => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable ❌", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}",
-                    _ => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}"
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is now reachable", ""),
+                    SeverityLevel.Critical => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable ❌", "")}{FmtError(r.Data)}",
+                    _ => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable", "")}{FmtError(r.Data)}"
                 },
                 AlertType.ServerCpu => WithLink(
                     $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} cpu usage at {r.GetDouble("percentage"):0.0}%",
-                    ResourceLink("server", r.GetString("id"))),
+                    ""),
                 AlertType.ServerMem =>
                     WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} memory usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💾\n\nUsing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
-                        ResourceLink("server", r.GetString("id"))),
+                        ""),
                 AlertType.ServerDisk =>
                     WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} disk usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💿\nmount point: {FmtPath(r.GetString("path"))}\nusing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
-                        ResourceLink("server", r.GetString("id"))),
+                        ""),
                 AlertType.ContainerStateChange =>
                     WithLink(
                         $"📦Deployment {r.GetString("name")} is now {FmtDockerContainerState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
-                        ResourceLink("deployment", r.GetString("id"))),
+                        ""),
                 AlertType.DeploymentImageUpdateAvailable =>
                     WithLink(
                         $"⬆ Deployment {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
-                        ResourceLink("deployment", r.GetString("id"))),
+                        ""),
                 AlertType.DeploymentAutoUpdated =>
                     WithLink(
                         $"⬆ Deployment {r.GetString("name")} was updated automatically\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
-                        ResourceLink("deployment", r.GetString("id"))),
+                        ""),
                 AlertType.StackStateChange =>
                     WithLink(
-                        $"🥞 Stack {r.GetString("name")} is now {FmtStackState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
-                        ResourceLink("stack", r.GetString("id"))),
+                        $"🥞 Stack {r.GetString("name")} is now {FmtStackState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}", ""),
                 AlertType.StackImageUpdateAvailable =>
                     WithLink(
                         $"⬆ Stack {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nservice: {r.GetString("service")}\nimage: {r.GetString("image")}",
-                        ResourceLink("stack", r.GetString("id"))),
+                        ""),
                 AlertType.StackAutoUpdated =>
                     WithLink(
                         $"⬆ Stack {r.GetString("name")} was updated automatically ⏫\nserver: {r.GetString("server_name")}\n{FmtImagesLabel(r.GetStringArray("images"))}",
-                        ResourceLink("stack", r.GetString("id"))),
+                        ""),
                 AlertType.AwsBuilderTerminationFailed =>
                     $"{level} | Failed to terminate AWS builder instance\ninstance id: {r.GetString("instance_id")}\n{r.GetString("message")}",
                 AlertType.ResourceSyncPendingUpdates =>
                     WithLink(
                         $"{level} | Pending resource sync updates on {r.GetString("name")}",
-                        ResourceLink("resourcesync", r.GetString("id"))),
+                        ""),
                 AlertType.BuildFailed =>
                     WithLink(
                         $"{level} | Build {r.GetString("name")} failed\nversion: v{r.GetVersion()}",
-                        ResourceLink("build", r.GetString("id"))),
+                        ""),
                 AlertType.RepoBuildFailed =>
                     WithLink(
                         $"{level} | Repo build for {r.GetString("name")} failed",
-                        ResourceLink("repo", r.GetString("id"))),
+                        ""),
                 AlertType.ProcedureFailed =>
                     WithLink(
                         $"{level} | Procedure {r.GetString("name")} failed",
-                        ResourceLink("procedure", r.GetString("id"))),
+                        ""),
                 AlertType.ActionFailed =>
                     WithLink(
                         $"{level} | Action {r.GetString("name")} failed",
-                        ResourceLink("action", r.GetString("id"))),
+                        ""),
                 AlertType.ScheduleRun =>
                     WithLink(
                         $"{level} | {r.GetString("name")} ({r.GetString("resource_type")}) | Scheduled run started 🕝",
-                        ResourceLink(r.GetString("resource_type"), r.GetString("id"))),
+                        ""),
                 AlertType.Custom =>
                     string.IsNullOrWhiteSpace(r.GetString("details"))
                         ? $"{level} | {r.GetString("message")}"
