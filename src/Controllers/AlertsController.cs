@@ -57,11 +57,10 @@ public class AlertsController(IHttpClientFactory httpClientFactory, ILogger<Aler
         var barkGroup = Environment.GetEnvironmentVariable("BARK_GROUP");
         var barkIcon = Environment.GetEnvironmentVariable("BARK_ICON");
         var barkPrefix = Environment.GetEnvironmentVariable("BARK_TITLE_PREFIX");
-        var barkUrl = Environment.GetEnvironmentVariable("BARK_URL");
         var barkSound = Environment.GetEnvironmentVariable("BARK_ALERT_SOUND");
         barkEndpoint += "/push";
         
-        var payload = AlertFormatter.CreateBarkPayload(alert, keys, barkPrefix, barkGroup, barkIcon, barkUrl, barkSound);
+        var payload = AlertFormatter.CreateBarkPayload(alert, keys, barkPrefix, barkGroup, barkIcon, barkSound);
 
         var client = _httpClientFactory.CreateClient("bark");
         var response = await client.PostAsJsonAsync(barkEndpoint, payload);

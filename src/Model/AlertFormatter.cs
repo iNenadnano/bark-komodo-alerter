@@ -52,52 +52,52 @@ namespace BarkKomodoAlerter.Model
         public static string Title(Alert alert) =>
             alert.Data.Type switch
             {
-                "Test" => $"Alerter test",
-                "ServerUnreachable" => $"Server unreachable",
-                "ServerCpu" => $"High CPU",
-                "ServerMem" => $"High memory",
-                "ServerDisk" => $"Disk usage",
-                "ServerVersionMismatch" => $"Version mismatch",
-                "ContainerStateChange" => $"Container state",
-                "DeploymentImageUpdateAvailable" => $"Deployment update available",
-                "DeploymentAutoUpdated" => $"Deployment auto-updated",
-                "StackStateChange" => $"Stack state",
-                "StackImageUpdateAvailable" => $"Stack update available",
-                "StackAutoUpdated" => $"Stack auto-updated",
-                "AwsBuilderTerminationFailed" => "AWS builder termination failed",
-                "ResourceSyncPendingUpdates" => $"Resource sync pending",
-                "BuildFailed" => $"Build failed",
-                "RepoBuildFailed" => $"Repo build failed",
-                "ProcedureFailed" => $"Procedure failed",
-                "ActionFailed" => $"Action failed",
-                "ScheduleRun" => $"Scheduled run",
-                "Custom" => alert.Data.GetString("message") ?? "Komodo alert",
+                AlertType.Test => $"Alerter test",
+                AlertType.ServerUnreachable => $"Server unreachable",
+                AlertType.ServerCpu => $"High CPU",
+                AlertType.ServerMem => $"High memory",
+                AlertType.ServerDisk => $"Disk usage",
+                AlertType.ServerVersionMismatch => $"Version mismatch",
+                AlertType.ContainerStateChange => $"Container state",
+                AlertType.DeploymentImageUpdateAvailable => $"Deployment update available",
+                AlertType.DeploymentAutoUpdated => $"Deployment auto-updated",
+                AlertType.StackStateChange => $"Stack state",
+                AlertType.StackImageUpdateAvailable => $"Stack update available",
+                AlertType.StackAutoUpdated => $"Stack auto-updated",
+                AlertType.AwsBuilderTerminationFailed => "AWS builder termination failed",
+                AlertType.ResourceSyncPendingUpdates => $"Resource sync pending",
+                AlertType.BuildFailed => $"Build failed",
+                AlertType.RepoBuildFailed => $"Repo build failed",
+                AlertType.ProcedureFailed => $"Procedure failed",
+                AlertType.ActionFailed => $"Action failed",
+                AlertType.ScheduleRun => $"Scheduled run",
+                AlertType.Custom => alert.Data.GetString("message") ?? "Komodo alert",
                 _ => "Komodo alert"
             };
 
         public static string Subtitle(Alert alert) =>
             alert.Data.Type switch
             {
-                "Test" => $"{alert.Data.GetString("name")}",
-                "ServerUnreachable" => $"{alert.Data.GetString("name")}",
-                "ServerCpu" => $"{alert.Data.GetString("name")}",
-                "ServerMem" => $"{alert.Data.GetString("name")}",
-                "ServerDisk" => $"{alert.Data.GetString("name")}",
-                "ServerVersionMismatch" => $"{alert.Data.GetString("name")}",
-                "ContainerStateChange" => $"{alert.Data.GetString("name")}",
-                "DeploymentImageUpdateAvailable" => $"{alert.Data.GetString("name")}",
-                "DeploymentAutoUpdated" => $"{alert.Data.GetString("name")}",
-                "StackStateChange" => $"{alert.Data.GetString("name")}",
-                "StackImageUpdateAvailable" => $"{alert.Data.GetString("name")}",
-                "StackAutoUpdated" => $"{alert.Data.GetString("name")}",
-                "AwsBuilderTerminationFailed" => "AWS builder termination failed",
-                "ResourceSyncPendingUpdates" => $"{alert.Data.GetString("name")}",
-                "BuildFailed" => $"{alert.Data.GetString("name")}",
-                "RepoBuildFailed" => $"{alert.Data.GetString("name")}",
-                "ProcedureFailed" => $"{alert.Data.GetString("name")}",
-                "ActionFailed" => $"{alert.Data.GetString("name")}",
-                "ScheduleRun" => $"{alert.Data.GetString("name")}",
-                "Custom" => alert.Data.GetString("message") ?? "Komodo alert",
+                AlertType.Test => $"{alert.Data.GetString("name")}",
+                AlertType.ServerUnreachable => $"{alert.Data.GetString("name")}",
+                AlertType.ServerCpu => $"{alert.Data.GetString("name")}",
+                AlertType.ServerMem => $"{alert.Data.GetString("name")}",
+                AlertType.ServerDisk => $"{alert.Data.GetString("name")}",
+                AlertType.ServerVersionMismatch => $"{alert.Data.GetString("name")}",
+                AlertType.ContainerStateChange => $"{alert.Data.GetString("name")}",
+                AlertType.DeploymentImageUpdateAvailable => $"{alert.Data.GetString("name")}",
+                AlertType.DeploymentAutoUpdated => $"{alert.Data.GetString("name")}",
+                AlertType.StackStateChange => $"{alert.Data.GetString("name")}",
+                AlertType.StackImageUpdateAvailable => $"{alert.Data.GetString("name")}",
+                AlertType.StackAutoUpdated => $"{alert.Data.GetString("name")}",
+                AlertType.AwsBuilderTerminationFailed => "AWS builder termination failed",
+                AlertType.ResourceSyncPendingUpdates => $"{alert.Data.GetString("name")}",
+                AlertType.BuildFailed => $"{alert.Data.GetString("name")}",
+                AlertType.RepoBuildFailed => $"{alert.Data.GetString("name")}",
+                AlertType.ProcedureFailed => $"{alert.Data.GetString("name")}",
+                AlertType.ActionFailed => $"{alert.Data.GetString("name")}",
+                AlertType.ScheduleRun => $"{alert.Data.GetString("name")}",
+                AlertType.Custom => alert.Data.GetString("message") ?? "Komodo alert",
                 _ => "Komodo alert"
             };
 
@@ -108,17 +108,17 @@ namespace BarkKomodoAlerter.Model
 
             return r.Type switch
             {
-                "Test" => WithLink(
+                AlertType.Test => WithLink(
                     $"{level} | If you see this message, then Alerter {r.GetString("name")} is working",
                     ResourceLink("alerter", r.GetString("id"))),
-                "ServerVersionMismatch" => alert.Level == SeverityLevel.Ok
+                AlertType.ServerVersionMismatch => alert.Level == SeverityLevel.Ok
                     ? WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Periphery version now matches Core version ✅",
                         ResourceLink("server", r.GetString("id")))
                     : WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Version mismatch detected ⚠️\nPeriphery: {r.GetString("server_version")} | Core: {r.GetString("core_version")}",
                         ResourceLink("server", r.GetString("id"))),
-                "ServerUnreachable" => alert.Level switch
+                AlertType.ServerUnreachable => alert.Level switch
                 {
                     SeverityLevel.Ok => WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is now reachable",
@@ -126,72 +126,72 @@ namespace BarkKomodoAlerter.Model
                     SeverityLevel.Critical => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable ❌", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}",
                     _ => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}"
                 },
-                "ServerCpu" => WithLink(
+                AlertType.ServerCpu => WithLink(
                     $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} cpu usage at {r.GetDouble("percentage"):0.0}%",
                     ResourceLink("server", r.GetString("id"))),
-                "ServerMem" =>
+                AlertType.ServerMem =>
                     WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} memory usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💾\n\nUsing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
                         ResourceLink("server", r.GetString("id"))),
-                "ServerDisk" =>
+                AlertType.ServerDisk =>
                     WithLink(
                         $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} disk usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💿\nmount point: {FmtPath(r.GetString("path"))}\nusing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
                         ResourceLink("server", r.GetString("id"))),
-                "ContainerStateChange" =>
+                AlertType.ContainerStateChange =>
                     WithLink(
                         $"📦Deployment {r.GetString("name")} is now {FmtDockerContainerState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
                         ResourceLink("deployment", r.GetString("id"))),
-                "DeploymentImageUpdateAvailable" =>
+                AlertType.DeploymentImageUpdateAvailable =>
                     WithLink(
                         $"⬆ Deployment {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
                         ResourceLink("deployment", r.GetString("id"))),
-                "DeploymentAutoUpdated" =>
+                AlertType.DeploymentAutoUpdated =>
                     WithLink(
                         $"⬆ Deployment {r.GetString("name")} was updated automatically\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
                         ResourceLink("deployment", r.GetString("id"))),
-                "StackStateChange" =>
+                AlertType.StackStateChange =>
                     WithLink(
                         $"🥞 Stack {r.GetString("name")} is now {FmtStackState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
                         ResourceLink("stack", r.GetString("id"))),
-                "StackImageUpdateAvailable" =>
+                AlertType.StackImageUpdateAvailable =>
                     WithLink(
                         $"⬆ Stack {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nservice: {r.GetString("service")}\nimage: {r.GetString("image")}",
                         ResourceLink("stack", r.GetString("id"))),
-                "StackAutoUpdated" =>
+                AlertType.StackAutoUpdated =>
                     WithLink(
                         $"⬆ Stack {r.GetString("name")} was updated automatically ⏫\nserver: {r.GetString("server_name")}\n{FmtImagesLabel(r.GetStringArray("images"))}",
                         ResourceLink("stack", r.GetString("id"))),
-                "AwsBuilderTerminationFailed" =>
+                AlertType.AwsBuilderTerminationFailed =>
                     $"{level} | Failed to terminate AWS builder instance\ninstance id: {r.GetString("instance_id")}\n{r.GetString("message")}",
-                "ResourceSyncPendingUpdates" =>
+                AlertType.ResourceSyncPendingUpdates =>
                     WithLink(
                         $"{level} | Pending resource sync updates on {r.GetString("name")}",
                         ResourceLink("resourcesync", r.GetString("id"))),
-                "BuildFailed" =>
+                AlertType.BuildFailed =>
                     WithLink(
                         $"{level} | Build {r.GetString("name")} failed\nversion: v{r.GetVersion()}",
                         ResourceLink("build", r.GetString("id"))),
-                "RepoBuildFailed" =>
+                AlertType.RepoBuildFailed =>
                     WithLink(
                         $"{level} | Repo build for {r.GetString("name")} failed",
                         ResourceLink("repo", r.GetString("id"))),
-                "ProcedureFailed" =>
+                AlertType.ProcedureFailed =>
                     WithLink(
                         $"{level} | Procedure {r.GetString("name")} failed",
                         ResourceLink("procedure", r.GetString("id"))),
-                "ActionFailed" =>
+                AlertType.ActionFailed =>
                     WithLink(
                         $"{level} | Action {r.GetString("name")} failed",
                         ResourceLink("action", r.GetString("id"))),
-                "ScheduleRun" =>
+                AlertType.ScheduleRun =>
                     WithLink(
                         $"{level} | {r.GetString("name")} ({r.GetString("resource_type")}) | Scheduled run started 🕝",
                         ResourceLink(r.GetString("resource_type"), r.GetString("id"))),
-                "Custom" =>
+                AlertType.Custom =>
                     string.IsNullOrWhiteSpace(r.GetString("details"))
                         ? $"{level} | {r.GetString("message")}"
                         : $"{level} | {r.GetString("message")}\n{r.GetString("details")}",
-                "None" => string.Empty,
+                AlertType.None => string.Empty,
                 _ => $"{level} | No alert details provided"
             };
         }
@@ -255,7 +255,6 @@ namespace BarkKomodoAlerter.Model
             string? prefix,
             string? group,
             string? icon,
-            string? url,
             string? sound)
         {
             var title = Title(alert);
@@ -287,9 +286,10 @@ namespace BarkKomodoAlerter.Model
                 payload["icon"] = icon;
             }
 
-            if (!string.IsNullOrWhiteSpace(url))
+            var resourceLink = GetResourceLink(alert);
+            if (!string.IsNullOrWhiteSpace(resourceLink))
             {
-                payload["url"] = url;
+                payload["url"] = resourceLink;
                 payload.Remove("action");
             }
 
@@ -309,6 +309,28 @@ namespace BarkKomodoAlerter.Model
             if (!AllowedSounds.Contains(trimmed)) return false;
             normalized = trimmed;
             return true;
+        }
+
+        private static string GetResourceLink(Alert alert)
+        {
+            var r = alert.Data;
+            return r.Type switch
+            {
+                AlertType.Test => ResourceLink("alerter", r.GetString("id")),
+                AlertType.ServerUnreachable or AlertType.ServerCpu or AlertType.ServerMem or AlertType.ServerDisk or AlertType.ServerVersionMismatch
+                    => ResourceLink("server", r.GetString("id")),
+                AlertType.ContainerStateChange or AlertType.DeploymentImageUpdateAvailable or AlertType.DeploymentAutoUpdated
+                    => ResourceLink("deployment", r.GetString("id")),
+                AlertType.StackStateChange or AlertType.StackImageUpdateAvailable or AlertType.StackAutoUpdated
+                    => ResourceLink("stack", r.GetString("id")),
+                AlertType.ResourceSyncPendingUpdates => ResourceLink("resourcesync", r.GetString("id")),
+                AlertType.BuildFailed => ResourceLink("build", r.GetString("id")),
+                AlertType.RepoBuildFailed => ResourceLink("repo", r.GetString("id")),
+                AlertType.ProcedureFailed => ResourceLink("procedure", r.GetString("id")),
+                AlertType.ActionFailed => ResourceLink("action", r.GetString("id")),
+                AlertType.ScheduleRun => ResourceLink(r.GetString("resource_type"), r.GetString("id")),
+                _ => string.Empty
+            };
         }
     }
 }

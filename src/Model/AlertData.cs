@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace BarkKomodoAlerter.Model
 {
     public record AlertData(
-    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("type")] AlertType Type,
     [property: JsonPropertyName("data")] JsonElement Data)
     {
         public string? GetString(string path)

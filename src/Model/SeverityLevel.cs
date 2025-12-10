@@ -9,3 +9,29 @@ public enum SeverityLevel
     Warning,
     Critical
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum AlertType
+{
+    Test,
+    ServerUnreachable,
+    ServerCpu,
+    ServerMem,
+    ServerDisk,
+    ServerVersionMismatch,
+    ContainerStateChange,
+    DeploymentImageUpdateAvailable,
+    DeploymentAutoUpdated,
+    StackStateChange,
+    StackImageUpdateAvailable,
+    StackAutoUpdated,
+    AwsBuilderTerminationFailed,
+    ResourceSyncPendingUpdates,
+    BuildFailed,
+    RepoBuildFailed,
+    ProcedureFailed,
+    ActionFailed,
+    ScheduleRun,
+    Custom,
+    None
+}
