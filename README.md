@@ -8,13 +8,13 @@ Small HTTP service that receives Komodo `Alert` payloads (the same JSON sent to 
 - Body: Komodo `Alert` JSON (as sent by `send_custom_alert` in Komodo Core).
 - Device keys: loaded from `BARK_DEVICE_KEYS` (comma/semicolon/newline separated). Requests are rejected with `400` if no keys are configured.
 - Mapping: The payload is parsed into `AlertData` variants and rendered into a plain-text `title` + `body` Bark request. Komodo severity is mapped to Bark `level` as `CRITICAL -> timeSensitive`, `WARNING -> active`, `OK -> passive`.
-- Forwarded to Bark JSON endpoint (default `https://notify.ace.rs/push`, override with `BARK_ENDPOINT`) with configured device keys, optional `group`, title (with optional prefix), body, and level. Optional icon and URL are applied when provided (URL removes the default “none” action).
+- Forwarded to Bark JSON endpoint (default `https://api.day.app/push`, override with `BARK_ENDPOINT`) with configured device keys, optional `group`, title (with optional prefix), body, and level. Optional icon and URL are applied when provided (URL removes the default “none” action).
 
 ## Configuration
 
 - `PORT` (default `8080`)
 - `BARK_DEVICE_KEYS` (required, comma/semicolon/newline separated list)
-- `BARK_ENDPOINT` (default `https://notify.ace.rs/push`)
+- `BARK_ENDPOINT` (default `https://api.day.app/push`)
 - `BARK_GROUP` (optional Bark group tag)
 - `BARK_ICON` (optional Bark icon URL)
 - `BARK_TITLE_PREFIX` (optional prefix added to Bark title)
