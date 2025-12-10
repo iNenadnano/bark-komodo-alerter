@@ -45,8 +45,6 @@ public class AlertsController(IHttpClientFactory httpClientFactory, ILogger<Aler
         }
 
         var keys = ReadDeviceKeys();
-        
-        keys = ["ZECoa9QBAaDANoeihRsP9C"];
 
         if (keys.Length == 0)
         {
