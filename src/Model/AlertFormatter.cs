@@ -197,7 +197,7 @@ namespace BarkKomodoAlerter.Model
         private static string FmtLevel(SeverityLevel level) =>
             level switch
             {
-                SeverityLevel.Critical => "CRITICAL \u1F6A8",
+                SeverityLevel.Critical => "CRITICAL \u203C\uFE0F",
                 SeverityLevel.Warning => "WARNING \u26A0\uFE0F",
                 SeverityLevel.Ok => "OK \u2705",
                 _ => "\u2753"
