@@ -1,13 +1,30 @@
-using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using Serilog;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/requests-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Keep console quieter by ignoring Microsoft.* info logs (e.g., endpoint execution)
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
-builder.Logging.AddFilter("System", LogLevel.Warning);
+builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Services(services)
+        .ReadFrom.Configuration(context.Configuration)
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File("logs/requests-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7);
+});
 
 builder.Services
     .AddControllers()
@@ -24,6 +41,9 @@ builder.Services.AddHttpClient("bark", client =>
 });
 
 var app = builder.Build();
+
+// Emit one log per HTTP request, including path, status code, and timing.
+app.UseSerilogRequestLogging();
 
 app.MapControllers();
 
