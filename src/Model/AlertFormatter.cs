@@ -232,7 +232,7 @@ namespace BarkKomodoAlerter.Model
             var baseUrl = Environment.GetEnvironmentVariable("KOMODO_APP_URL");
             if (string.IsNullOrWhiteSpace(baseUrl))
             {
-                return $"id: {id}";
+                return string.Empty;
             }
 
             var slug = string.IsNullOrWhiteSpace(variant) ? "resource" : variant.ToLowerInvariant();
