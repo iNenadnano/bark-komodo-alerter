@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace KomodoBarkAlerter.Model
+namespace BarkKomodoAlerter.Model
 {
     public record AlertData(
     [property: JsonPropertyName("type")] string Type,

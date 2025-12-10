@@ -1,7 +1,12 @@
+using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
-using KomodoBarkAlerter.Model;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Keep console quieter by ignoring Microsoft.* info logs (e.g., endpoint execution)
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
 
 builder.Services
     .AddControllers()

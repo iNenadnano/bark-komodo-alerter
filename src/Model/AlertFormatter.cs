@@ -1,4 +1,6 @@
-namespace KomodoBarkAlerter.Model
+using System.Text.Json;
+
+namespace BarkKomodoAlerter.Model
 {
     public static class AlertFormatter
     {
@@ -101,60 +103,95 @@ namespace KomodoBarkAlerter.Model
 
         public static string Body(Alert alert)
         {
-            //var level = alert.Level.ToString().ToUpperInvariant();
-            var level = string.Empty;
-            switch (alert.Level) {
-                case SeverityLevel.Critical:
-                    level = "\u274C";
-                    break;
-                case SeverityLevel.Warning:
-                    level = "\u26A0\uFE0F";
-                    break;
-                case SeverityLevel.Ok:
-                    level = "\u2705";
-                    break;
-            }
+            var level = FmtLevel(alert.Level);
             var r = alert.Data;
+
             return r.Type switch
             {
-                "Test" => $"{level} | Test alerter {r.GetString("name")} ({r.GetString("id")})",
-                "ServerVersionMismatch" => $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | server: {r.GetString("server_version")} | core: {r.GetString("core_version")}",
-                "ServerUnreachable" => $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable {r.GetString("err.error")}",
-                "ServerCpu" => $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} CPU at {r.GetDouble("percentage"):0.0}%",
+                "Test" => WithLink(
+                    $"{level} | If you see this message, then Alerter {r.GetString("name")} is working",
+                    ResourceLink("alerter", r.GetString("id"))),
+                "ServerVersionMismatch" => alert.Level == SeverityLevel.Ok
+                    ? WithLink(
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Periphery version now matches Core version ✅",
+                        ResourceLink("server", r.GetString("id")))
+                    : WithLink(
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} | Version mismatch detected ⚠️\nPeriphery: {r.GetString("server_version")} | Core: {r.GetString("core_version")}",
+                        ResourceLink("server", r.GetString("id"))),
+                "ServerUnreachable" => alert.Level switch
+                {
+                    SeverityLevel.Ok => WithLink(
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is now reachable",
+                        ResourceLink("server", r.GetString("id"))),
+                    SeverityLevel.Critical => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable ❌", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}",
+                    _ => $"{WithLink($"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} is unreachable", ResourceLink("server", r.GetString("id")))}{FmtError(r.Data)}"
+                },
+                "ServerCpu" => WithLink(
+                    $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} cpu usage at {r.GetDouble("percentage"):0.0}%",
+                    ResourceLink("server", r.GetString("id"))),
                 "ServerMem" =>
-                    $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} memory at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}% ({r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB)",
+                    WithLink(
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} memory usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💾\n\nUsing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
+                        ResourceLink("server", r.GetString("id"))),
                 "ServerDisk" =>
-                    $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} disk at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}% (path: {r.GetString("path")}) using {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
+                    WithLink(
+                        $"{level} | {r.GetString("name")}{FmtRegion(r.GetString("region"))} disk usage at {Percent(r.GetDouble("used_gb"), r.GetDouble("total_gb")):0.0}%💿\nmount point: {FmtPath(r.GetString("path"))}\nusing {r.GetDouble("used_gb"):0.0} GiB / {r.GetDouble("total_gb"):0.0} GiB",
+                        ResourceLink("server", r.GetString("id"))),
                 "ContainerStateChange" =>
-                    $"{level} | Deployment {r.GetString("name")} on {r.GetString("server_name")} is now {r.GetString("to")} (previously {r.GetString("from")})",
+                    WithLink(
+                        $"📦Deployment {r.GetString("name")} is now {FmtDockerContainerState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
+                        ResourceLink("deployment", r.GetString("id"))),
                 "DeploymentImageUpdateAvailable" =>
-                    $"{level} | Deployment {r.GetString("name")} on {r.GetString("server_name")} has an update available for {r.GetString("image")}",
+                    WithLink(
+                        $"⬆ Deployment {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
+                        ResourceLink("deployment", r.GetString("id"))),
                 "DeploymentAutoUpdated" =>
-                    $"{level} | Deployment {r.GetString("name")} on {r.GetString("server_name")} was auto-updated to {r.GetString("image")}",
+                    WithLink(
+                        $"⬆ Deployment {r.GetString("name")} was updated automatically\nserver: {r.GetString("server_name")}\nimage: {r.GetString("image")}",
+                        ResourceLink("deployment", r.GetString("id"))),
                 "StackStateChange" =>
-                    $"{level} | Stack {r.GetString("name")} on {r.GetString("server_name")} is now {r.GetString("to")} (previously {r.GetString("from")})",
+                    WithLink(
+                        $"🥞 Stack {r.GetString("name")} is now {FmtStackState(r.GetString("to"))}\nserver: {r.GetString("server_name")}\nprevious: {r.GetString("from")}",
+                        ResourceLink("stack", r.GetString("id"))),
                 "StackImageUpdateAvailable" =>
-                    $"{level} | Stack {r.GetString("name")} on {r.GetString("server_name")} service {r.GetString("service")} update available: {r.GetString("image")}",
+                    WithLink(
+                        $"⬆ Stack {r.GetString("name")} has an update available\nserver: {r.GetString("server_name")}\nservice: {r.GetString("service")}\nimage: {r.GetString("image")}",
+                        ResourceLink("stack", r.GetString("id"))),
                 "StackAutoUpdated" =>
-                    $"{level} | Stack {r.GetString("name")} on {r.GetString("server_name")} auto-updated: {string.Join(", ", r.GetStringArray("images"))}",
+                    WithLink(
+                        $"⬆ Stack {r.GetString("name")} was updated automatically ⏫\nserver: {r.GetString("server_name")}\n{FmtImagesLabel(r.GetStringArray("images"))}",
+                        ResourceLink("stack", r.GetString("id"))),
                 "AwsBuilderTerminationFailed" =>
-                    $"{level} | Failed to terminate AWS builder instance {r.GetString("instance_id")}\n{r.GetString("message")}",
+                    $"{level} | Failed to terminate AWS builder instance\ninstance id: {r.GetString("instance_id")}\n{r.GetString("message")}",
                 "ResourceSyncPendingUpdates" =>
-                    $"{level} | Pending resource sync updates on {r.GetString("name")}",
+                    WithLink(
+                        $"{level} | Pending resource sync updates on {r.GetString("name")}",
+                        ResourceLink("resourcesync", r.GetString("id"))),
                 "BuildFailed" =>
-                    $"{level} | Build {r.GetString("name")} failed (version v{r.GetVersion()})",
+                    WithLink(
+                        $"{level} | Build {r.GetString("name")} failed\nversion: v{r.GetVersion()}",
+                        ResourceLink("build", r.GetString("id"))),
                 "RepoBuildFailed" =>
-                    $"{level} | Repo build for {r.GetString("name")} failed",
+                    WithLink(
+                        $"{level} | Repo build for {r.GetString("name")} failed",
+                        ResourceLink("repo", r.GetString("id"))),
                 "ProcedureFailed" =>
-                    $"{level} | Procedure {r.GetString("name")} failed",
+                    WithLink(
+                        $"{level} | Procedure {r.GetString("name")} failed",
+                        ResourceLink("procedure", r.GetString("id"))),
                 "ActionFailed" =>
-                    $"{level} | Action {r.GetString("name")} failed",
+                    WithLink(
+                        $"{level} | Action {r.GetString("name")} failed",
+                        ResourceLink("action", r.GetString("id"))),
                 "ScheduleRun" =>
-                    $"{level} | {r.GetString("name")} ({r.GetString("resource_type")}) scheduled run started",
+                    WithLink(
+                        $"{level} | {r.GetString("name")} ({r.GetString("resource_type")}) | Scheduled run started 🕝",
+                        ResourceLink(r.GetString("resource_type"), r.GetString("id"))),
                 "Custom" =>
                     string.IsNullOrWhiteSpace(r.GetString("details"))
                         ? $"{level} | {r.GetString("message")}"
                         : $"{level} | {r.GetString("message")}\n{r.GetString("details")}",
+                "None" => string.Empty,
                 _ => $"{level} | No alert details provided"
             };
         }
@@ -162,8 +199,56 @@ namespace KomodoBarkAlerter.Model
         private static double Percent(double used, double total) =>
             total <= 0 ? 0 : (used / total) * 100.0;
 
+        private static string FmtLevel(SeverityLevel level) =>
+            level switch
+            {
+                SeverityLevel.Critical => "CRITICAL \u1F6A8",
+                SeverityLevel.Warning => "WARNING \u26A0\uFE0F",
+                SeverityLevel.Ok => "OK \u2705",
+                _ => "\u2753"
+            };
+
         private static string FmtRegion(string? region) =>
             string.IsNullOrWhiteSpace(region) ? string.Empty : $" ({region})";
+
+        private static string FmtDockerContainerState(string? state) =>
+            string.IsNullOrWhiteSpace(state) ? "unknown" : state.Replace('_', ' ');
+
+        private static string FmtStackState(string? state) =>
+            string.IsNullOrWhiteSpace(state) ? "unknown" : state.Replace('_', ' ');
+
+        private static string FmtImagesLabel(IEnumerable<string> images)
+        {
+            var list = images?.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray() ?? Array.Empty<string>();
+            if (list.Length == 0) return "image: -";
+            var label = list.Length > 1 ? "images" : "image";
+            return $"{label}: {string.Join(", ", list)}";
+        }
+
+        private static string FmtPath(string? path) =>
+            path is null ? "null" : $"\"{path}\"";
+
+        private static string WithLink(string text, string link) =>
+            string.IsNullOrWhiteSpace(link) ? text : $"{text}\n{link}";
+
+        private static string ResourceLink(string? variant, string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return string.Empty;
+            var baseUrl = Environment.GetEnvironmentVariable("KOMODO_APP_URL");
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                return $"id: {id}";
+            }
+
+            var slug = string.IsNullOrWhiteSpace(variant) ? "resource" : variant.ToLowerInvariant();
+            return $"{baseUrl.TrimEnd('/')}/{slug}/{id}";
+        }
+
+        private static string FmtError(JsonElement data) =>
+            data.TryGetProperty("err", out var err) && err.ValueKind != JsonValueKind.Null && err.ValueKind != JsonValueKind.Undefined
+                ? $"\nerror: {err}"
+                : string.Empty;
+
         public static object CreateBarkPayload(
             Alert alert,
             string[] deviceKeys,

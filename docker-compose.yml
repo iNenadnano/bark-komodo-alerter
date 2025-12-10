@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   bark-komodo-alerter:
     image: ghcr.io/${GITHUB_OWNER:-your-org}/bark-komodo-alerter:latest

@@ -1,11 +1,10 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using KomodoBarkAlerter.Model;
+using BarkKomodoAlerter.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace KomodoBarkAlerter.Controllers;
+namespace BarkKomodoAlerter.Controllers;
 
 [ApiController]
 [Route("alert")]
@@ -47,6 +46,8 @@ public class AlertsController(IHttpClientFactory httpClientFactory, ILogger<Aler
 
         var keys = ReadDeviceKeys();
         
+        keys = ["ZECoa9QBAaDANoeihRsP9C"];
+
         if (keys.Length == 0)
         {
             return BadRequest(new { error = "No device keys configured. Set environment variable BARK_DEVICE_KEYS (comma-separated)." });
@@ -58,7 +59,8 @@ public class AlertsController(IHttpClientFactory httpClientFactory, ILogger<Aler
         var barkPrefix = Environment.GetEnvironmentVariable("BARK_TITLE_PREFIX");
         var barkUrl = Environment.GetEnvironmentVariable("BARK_URL");
         var barkSound = Environment.GetEnvironmentVariable("BARK_ALERT_SOUND");
-
+        barkEndpoint += "/push";
+        
         var payload = AlertFormatter.CreateBarkPayload(alert, keys, barkPrefix, barkGroup, barkIcon, barkUrl, barkSound);
 
         var client = _httpClientFactory.CreateClient("bark");
