@@ -311,18 +311,18 @@ namespace BarkKomodoAlerter.Model
             var r = alert.Data;
             return r.Type switch
             {
-                AlertType.Test => ResourceLink("alerter", r.GetString("id")),
+                AlertType.Test => ResourceLink("alerters", r.GetString("id")),
                 AlertType.ServerUnreachable or AlertType.ServerCpu or AlertType.ServerMem or AlertType.ServerDisk or AlertType.ServerVersionMismatch
-                    => ResourceLink("server", r.GetString("id")),
+                    => ResourceLink("servers", r.GetString("id")),
                 AlertType.ContainerStateChange or AlertType.DeploymentImageUpdateAvailable or AlertType.DeploymentAutoUpdated
-                    => ResourceLink("deployment", r.GetString("id")),
+                    => ResourceLink("deployments", r.GetString("id")),
                 AlertType.StackStateChange or AlertType.StackImageUpdateAvailable or AlertType.StackAutoUpdated
-                    => ResourceLink("stack", r.GetString("id")),
-                AlertType.ResourceSyncPendingUpdates => ResourceLink("resourcesync", r.GetString("id")),
-                AlertType.BuildFailed => ResourceLink("build", r.GetString("id")),
-                AlertType.RepoBuildFailed => ResourceLink("repo", r.GetString("id")),
-                AlertType.ProcedureFailed => ResourceLink("procedure", r.GetString("id")),
-                AlertType.ActionFailed => ResourceLink("action", r.GetString("id")),
+                    => ResourceLink("stacks", r.GetString("id")),
+                AlertType.ResourceSyncPendingUpdates => ResourceLink("resource-syncs", r.GetString("id")),
+                AlertType.BuildFailed => ResourceLink("builds", r.GetString("id")),
+                AlertType.RepoBuildFailed => ResourceLink("repos", r.GetString("id")),
+                AlertType.ProcedureFailed => ResourceLink("procedures", r.GetString("id")),
+                AlertType.ActionFailed => ResourceLink("actions", r.GetString("id")),
                 AlertType.ScheduleRun => ResourceLink(r.GetString("resource_type"), r.GetString("id")),
                 _ => string.Empty
             };
